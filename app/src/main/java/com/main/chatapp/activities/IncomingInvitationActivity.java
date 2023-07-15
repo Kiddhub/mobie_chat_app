@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -36,7 +37,6 @@ public class IncomingInvitationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityIncomingInvitationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-//        setContentView(R.layout.activity_incoming_invitation);
         ImageView imageMeetingType = findViewById(R.id.imageMeetingType);
         String meetingType = getIntent().getStringExtra(Constants.REMOTE_MSG_MEETING_TYPE);
 
@@ -86,22 +86,20 @@ public class IncomingInvitationActivity extends AppCompatActivity {
                 Constants.getRemoteMsgHeaders(), remoteMessageBody)
                 .enqueue(new Callback<String>() {
                     @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
+                    public void onResponse(@NonNull  Call<String> call, @NonNull Response<String> response) {
                         if (response.isSuccessful()) {
                             if (type.equals(Constants.REMOTE_MSG_INVITATION_ACCEPTED)) {
                                 Toast.makeText(IncomingInvitationActivity.this, "Invitation Accepted", Toast.LENGTH_SHORT).show();
-                            } else if(type.equals(Constants.REMOTE_MSG_INVITATION_REJECTED)) {
+                            } else{
                                 Toast.makeText(IncomingInvitationActivity.this, "Invitation Rejected", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             Toast.makeText(IncomingInvitationActivity.this, response.message(), Toast.LENGTH_SHORT).show();
                         }
                         finish();
-
                     }
-
                     @Override
-                    public void onFailure(Call<String> call, Throwable t) {
+                    public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
                         Toast.makeText(IncomingInvitationActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                         finish();
                     }

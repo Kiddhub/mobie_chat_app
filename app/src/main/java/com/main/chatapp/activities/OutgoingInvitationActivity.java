@@ -7,10 +7,12 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.installations.FirebaseInstallations;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.main.chatapp.R;
 import com.main.chatapp.databinding.ActivityOutgoingInvitationBinding;
 import com.main.chatapp.models.User;
@@ -22,6 +24,8 @@ import com.main.chatapp.utilities.PreferenceManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.UUID;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -31,6 +35,7 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
     private ActivityOutgoingInvitationBinding binding;
     private PreferenceManager preferenceManager;
     private String inviterToken = null;
+    String meetingRoom = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,7 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         preferenceManager = new PreferenceManager(getApplicationContext());
+
         String meetingType = getIntent().getStringExtra("type");
         if (meetingType != null && meetingType.equals("video")) {
             binding.imageMeetingType.setImageResource(R.drawable.ic_video);
@@ -55,9 +61,9 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
             }
 
         });
-        FirebaseInstallations.getInstance().getToken(true).addOnCompleteListener(task -> {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                inviterToken = task.getResult().getToken();
+                inviterToken = task.getResult();
                 if (meetingType != null && user != null) {
                     initiateMeeting(meetingType, user.token);
                 }
@@ -78,6 +84,12 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
             data.put(Constants.REMOTE_MSG_MEETING_TYPE, meetingType);
             data.put(Constants.KEY_NAME, preferenceManager.getString(Constants.KEY_NAME));
             data.put(Constants.REMOTE_MSG_INVITER_TOKEN, inviterToken);
+
+            meetingRoom =
+                    preferenceManager.getString(Constants.KEY_USER_ID) + "_" +
+                            UUID.randomUUID().toString().substring(0,5);
+
+            data.put(Constants.REMOTE_MSG_MEETING_ROOM,meetingRoom);
 
             body.put(Constants.REMOTE_MSG_DATA, data);
             body.put(Constants.REMOTE_MSG_REGISTRATION_IDS, tokens);
@@ -113,10 +125,10 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
                         Constants.getRemoteMsgHeaders(), remoteMessageBody)
                 .enqueue(new Callback<String>() {
                     @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
+                    public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                         if (response.isSuccessful()) {
                             if (type.equals(Constants.REMOTE_MSG_INVITATION)) {
-                                Toast.makeText(OutgoingInvitationActivity.this, "Invitation sent", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(OutgoingInvitationActivity.this, "Invitation sent successfully", Toast.LENGTH_SHORT).show();
                             } else if (type.equals(Constants.REMOTE_MSG_INVITATION_RESPONSE)) {
                                 Toast.makeText(OutgoingInvitationActivity.this, "Invitation Cancelled", Toast.LENGTH_SHORT).show();
                                 finish();
@@ -128,7 +140,7 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<String> call, Throwable t) {
+                    public void onFailure(@NonNull  Call<String> call, @NonNull Throwable t) {
                         Toast.makeText(OutgoingInvitationActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                         finish();
                     }
@@ -142,7 +154,8 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
             if (type != null) {
                 if (type.equals(Constants.REMOTE_MSG_INVITATION_ACCEPTED)) {
                     Toast.makeText(context, "Invitation Accepted", Toast.LENGTH_SHORT).show();
-                } else if (type.equals(Constants.REMOTE_MSG_INVITATION_REJECTED)) {
+                    finish();
+                } else {
                     Toast.makeText(context, "Invitation Rejected", Toast.LENGTH_SHORT).show();
                     finish();
                 }

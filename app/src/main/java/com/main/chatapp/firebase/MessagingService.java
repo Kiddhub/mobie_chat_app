@@ -38,6 +38,10 @@ public class MessagingService extends FirebaseMessagingService {
                         Constants.REMOTE_MSG_INVITER_TOKEN,
                         message.getData().get(Constants.REMOTE_MSG_INVITER_TOKEN)
                 );
+                intent.putExtra(
+                        Constants.REMOTE_MSG_MEETING_ROOM,
+                        message.getData().get(Constants.REMOTE_MSG_MEETING_ROOM)
+                );
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
