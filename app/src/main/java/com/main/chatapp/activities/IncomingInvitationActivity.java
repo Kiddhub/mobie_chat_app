@@ -21,14 +21,20 @@ import com.main.chatapp.network.ApiClient;
 import com.main.chatapp.network.ApiService;
 import com.main.chatapp.utilities.Constants;
 
+import org.jitsi.meet.sdk.JitsiMeetActivity;
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.net.URL;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class IncomingInvitationActivity extends AppCompatActivity {
+
+    private String meetingType = null;
 
     private ActivityIncomingInvitationBinding binding;
 
@@ -38,10 +44,14 @@ public class IncomingInvitationActivity extends AppCompatActivity {
         binding = ActivityIncomingInvitationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         ImageView imageMeetingType = findViewById(R.id.imageMeetingType);
-        String meetingType = getIntent().getStringExtra(Constants.REMOTE_MSG_MEETING_TYPE);
+        meetingType = getIntent().getStringExtra(Constants.REMOTE_MSG_MEETING_TYPE);
 
-        if (meetingType != null && meetingType.equals("video")) {
-            binding.imageMeetingType.setImageResource(R.drawable.ic_video);
+        if (meetingType != null){
+            if(meetingType.equals("video")){
+                binding.imageMeetingType.setImageResource(R.drawable.ic_video);
+            }else {
+                binding.imageMeetingType.setImageResource(R.drawable.ic_audio);
+            }
         }
         String name = getIntent().getStringExtra(Constants.KEY_NAME);
         if (name != null) {
@@ -89,14 +99,31 @@ public class IncomingInvitationActivity extends AppCompatActivity {
                     public void onResponse(@NonNull  Call<String> call, @NonNull Response<String> response) {
                         if (response.isSuccessful()) {
                             if (type.equals(Constants.REMOTE_MSG_INVITATION_ACCEPTED)) {
-                                Toast.makeText(IncomingInvitationActivity.this, "Invitation Accepted", Toast.LENGTH_SHORT).show();
+
+                                try{
+                                    URL serverURL = new URL("https://meet.jit.si");
+                                    JitsiMeetConferenceOptions.Builder builder = new JitsiMeetConferenceOptions.Builder();
+                                    builder.setServerURL(serverURL);
+                                    builder.setRoom(getIntent().getStringExtra(Constants.REMOTE_MSG_MEETING_ROOM));
+
+                                    if(meetingType.equals("audio")){
+                                        builder.setVideoMuted(true);
+                                    }
+                                    JitsiMeetActivity.launch(IncomingInvitationActivity.this,builder.build());
+                                    finish();
+                                }catch (Exception e){
+                                    Toast.makeText(IncomingInvitationActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
                             } else{
                                 Toast.makeText(IncomingInvitationActivity.this, "Invitation Rejected", Toast.LENGTH_SHORT).show();
+                                finish();
                             }
                         } else {
                             Toast.makeText(IncomingInvitationActivity.this, response.message(), Toast.LENGTH_SHORT).show();
+                            finish();
                         }
-                        finish();
+
                     }
                     @Override
                     public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
