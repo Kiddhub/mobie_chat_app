@@ -85,20 +85,20 @@ public class ChatActivity extends BaseActivity implements UserListener {
             conversion.put(Constants.KEY_TIMESTAMP, new Date());
             addConversion(conversion);
         }
-        if(!isReceiverAvailable){
+        if (!isReceiverAvailable) {
             try {
                 JSONArray tokens = new JSONArray();
                 tokens.put(receiverUser.token);
                 JSONObject data = new JSONObject();
-                data.put(Constants.KEY_USER_ID,preferenceManager.getString(Constants.KEY_USER_ID));
-                data.put(Constants.KEY_NAME,preferenceManager.getString(Constants.KEY_NAME));
-                data.put(Constants.KEY_FCM_TOKEN,preferenceManager.getString(Constants.KEY_FCM_TOKEN));
-                data.put(Constants.KEY_MESSAGE,binding.inputMessage.getText().toString());
+                data.put(Constants.KEY_USER_ID, preferenceManager.getString(Constants.KEY_USER_ID));
+                data.put(Constants.KEY_NAME, preferenceManager.getString(Constants.KEY_NAME));
+                data.put(Constants.KEY_FCM_TOKEN, preferenceManager.getString(Constants.KEY_FCM_TOKEN));
+                data.put(Constants.KEY_MESSAGE, binding.inputMessage.getText().toString());
                 JSONObject body = new JSONObject();
-                body.put(Constants.REMOTE_MSG_DATA,data);
-                body.put(Constants.REMOTE_MSG_REGISTRATION_IDS,tokens);
+                body.put(Constants.REMOTE_MSG_DATA, data);
+                body.put(Constants.REMOTE_MSG_REGISTRATION_IDS, tokens);
                 sendNotification(body.toString());
-            }catch (Exception exception){
+            } catch (Exception exception) {
                 showToast(exception.getMessage());
             }
         }
@@ -116,34 +116,33 @@ public class ChatActivity extends BaseActivity implements UserListener {
         ).enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if(response.isSuccessful()){
-                try {
-                    if (response.body() != null) {
-                        JSONObject responseJson = new JSONObject(response.body());
-                        JSONArray results = responseJson.getJSONArray("results");
-                        if (responseJson.getInt("failure") == 1) {
-                            JSONObject error = (JSONObject) results.get(0);
-                            showToast(error.getString("error"));
-                            return;
+                if (response.isSuccessful()) {
+                    try {
+                        if (response.body() != null) {
+                            JSONObject responseJson = new JSONObject(response.body());
+                            JSONArray results = responseJson.getJSONArray("results");
+                            if (responseJson.getInt("failure") == 1) {
+                                JSONObject error = (JSONObject) results.get(0);
+                                showToast(error.getString("error"));
+                                return;
+                            }
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    showToast("Notification sent successfully");
+                } else {
+                    showToast("Error:" + response.code());
                 }
-                showToast("Notification sent successfully");
-            }else
-            {
-                showToast("Error:" + response.code());
             }
-        }
 
-        @Override
-        public void onFailure (Call < String > call, Throwable t){
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
                 showToast(t.getMessage());
 
-        }
-    });
-}
+            }
+        });
+    }
 
     private void listenAvailabilityOfReceiver() {
         database.collection(Constants.KEY_COLLECTION_USERS).document(
@@ -160,10 +159,10 @@ public class ChatActivity extends BaseActivity implements UserListener {
                     isReceiverAvailable = availability == 1;
                 }
                 receiverUser.token = value.getString(Constants.KEY_FCM_TOKEN);
-                if(receiverUser.image == null){
+                if (receiverUser.image == null) {
                     receiverUser.image = value.getString(Constants.KEY_IMAGE);
                     chatAdapter.setReceiverProfileImage(getBitmapFromEncodeString(receiverUser.image));
-                    chatAdapter.notifyItemRangeChanged(0,chatMessages.size());
+                    chatAdapter.notifyItemRangeChanged(0, chatMessages.size());
                 }
             }
             if (isReceiverAvailable) {
@@ -232,10 +231,10 @@ public class ChatActivity extends BaseActivity implements UserListener {
     }
 
     private Bitmap getBitmapFromEncodeString(String encodedImage) {
-        if(encodedImage != null){
+        if (encodedImage != null) {
             byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
             return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        }else {
+        } else {
             return null;
         }
 
@@ -251,6 +250,7 @@ public class ChatActivity extends BaseActivity implements UserListener {
         binding.layoutSend.setOnClickListener(v -> sendMessage());
         binding.imageAudioMeeting.setOnClickListener(v -> initiateAudioMeeting(receiverUser));
         binding.imageVideoMeeting.setOnClickListener(v -> initiateVideoMeeting(receiverUser));
+        binding.playGameBtn.setOnClickListener(v -> initiateGame(receiverUser));
     }
 
     private String getReadableDateTime(Date date) {
@@ -312,34 +312,52 @@ public class ChatActivity extends BaseActivity implements UserListener {
 
     @Override
     public void initiateVideoMeeting(User user) {
-        if(user.token == null || user.token.trim().isEmpty()){
+        if (user.token == null || user.token.trim().isEmpty()) {
             Toast.makeText(
                     this,
                     user.name + "is not available for meeting",
                     Toast.LENGTH_SHORT
             ).show();
-        }else {
+        } else {
             Intent intent = new Intent(getApplicationContext(), OutgoingInvitationActivity.class);
-            intent.putExtra("user",user);
-            intent.putExtra("type","video");
+            intent.putExtra("user", user);
+            intent.putExtra("type", "video");
             startActivity(intent);
         }
     }
 
     @Override
     public void initiateAudioMeeting(User user) {
-        if(user.token == null || user.token.trim().isEmpty()){
+        if (user.token == null || user.token.trim().isEmpty()) {
             Toast.makeText(
                     this,
                     user.name + "is not available for audio",
                     Toast.LENGTH_SHORT
             ).show();
-        }else {
+        } else {
             Intent intent = new Intent(getApplicationContext(), OutgoingInvitationActivity.class);
-            intent.putExtra("user",user);
-            intent.putExtra("type","audio");
+            intent.putExtra("user", user);
+            intent.putExtra("type", "audio");
             startActivity(intent);
         }
 
     }
+
+    @Override
+    public void initiateGame(User user) {
+        if (user.token == null || user.token.trim().isEmpty()) {
+            Toast.makeText(
+                    this,
+                    user.name + "is not available for audio",
+                    Toast.LENGTH_SHORT
+            ).show();
+        } else {
+            Intent intent = new Intent(getApplicationContext(), OutgoingInvitationActivity.class);
+            intent.putExtra("user", user);
+            intent.putExtra("type", "game");
+            startActivity(intent);
+        }
+    }
+
+
 }

@@ -99,22 +99,27 @@ public class IncomingInvitationActivity extends AppCompatActivity {
                     public void onResponse(@NonNull  Call<String> call, @NonNull Response<String> response) {
                         if (response.isSuccessful()) {
                             if (type.equals(Constants.REMOTE_MSG_INVITATION_ACCEPTED)) {
+                                if(meetingType.equals("audio") || meetingType.equals("video")){
+                                    try{
+                                        URL serverURL = new URL("https://meet.jit.si");
+                                        JitsiMeetConferenceOptions.Builder builder = new JitsiMeetConferenceOptions.Builder();
+                                        builder.setServerURL(serverURL);
+                                        builder.setRoom(getIntent().getStringExtra(Constants.REMOTE_MSG_MEETING_ROOM));
 
-                                try{
-                                    URL serverURL = new URL("https://meet.jit.si");
-                                    JitsiMeetConferenceOptions.Builder builder = new JitsiMeetConferenceOptions.Builder();
-                                    builder.setServerURL(serverURL);
-                                    builder.setRoom(getIntent().getStringExtra(Constants.REMOTE_MSG_MEETING_ROOM));
-
-                                    if(meetingType.equals("audio")){
-                                        builder.setVideoMuted(true);
+                                        if(meetingType.equals("audio")){
+                                            builder.setVideoMuted(true);
+                                        }
+                                        JitsiMeetActivity.launch(IncomingInvitationActivity.this,builder.build());
+                                        finish();
+                                    }catch (Exception e){
+                                        Toast.makeText(IncomingInvitationActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                                        finish();
                                     }
-                                    JitsiMeetActivity.launch(IncomingInvitationActivity.this,builder.build());
-                                    finish();
-                                }catch (Exception e){
-                                    Toast.makeText(IncomingInvitationActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
-                                    finish();
+                                } else if (meetingType.equals("game")) {
+                                    Intent intent = new Intent(getApplicationContext(), PlayerName.class);
+                                    startActivity(intent);
                                 }
+
                             } else{
                                 Toast.makeText(IncomingInvitationActivity.this, "Invitation Rejected", Toast.LENGTH_SHORT).show();
                                 finish();

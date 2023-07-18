@@ -127,5 +127,10 @@ public class UsersActivity extends BaseActivity implements UserListener {
 
     }
 
+    @Override
+    public void initiateGame(User user) {
+
+    }
+
 
 }

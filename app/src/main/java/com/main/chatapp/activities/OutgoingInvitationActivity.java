@@ -54,8 +54,10 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
         if (meetingType != null) {
             if (meetingType.equals("video")) {
                 binding.imageMeetingType.setImageResource(R.drawable.ic_video);
-            } else {
+            } else if(meetingType.equals("audio")) {
                 binding.imageMeetingType.setImageResource(R.drawable.ic_audio);
+            }else{
+                binding.imageMeetingType.setImageResource(R.drawable.ic_game);
             }
         }
         User user = (User) getIntent().getSerializableExtra("user");
@@ -85,7 +87,6 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
         try {
             JSONArray tokens = new JSONArray();
             tokens.put(receiverToken);
-
             JSONObject body = new JSONObject();
             JSONObject data = new JSONObject();
             data.put(Constants.REMOTE_MSG_TYPE, Constants.REMOTE_MSG_INVITATION);
@@ -162,20 +163,26 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
             String type = intent.getStringExtra(Constants.REMOTE_MSG_INVITATION_RESPONSE);
             if (type != null) {
                 if (type.equals(Constants.REMOTE_MSG_INVITATION_ACCEPTED)) {
-                    try {
-                        URL serverURL = new URL("https://meet.jit.si");
-                        JitsiMeetConferenceOptions.Builder builder = new JitsiMeetConferenceOptions.Builder();
-                        builder.setServerURL(serverURL);
-                        builder.setRoom(meetingRoom);
-                        if(meetingType.equals("audio")){
-                            builder.setVideoMuted(true);
+                    if(meetingType.equals("audio") || meetingType.equals("video")){
+                        try {
+                            URL serverURL = new URL("https://meet.jit.si");
+                            JitsiMeetConferenceOptions.Builder builder = new JitsiMeetConferenceOptions.Builder();
+                            builder.setServerURL(serverURL);
+                            builder.setRoom(meetingRoom);
+                            if(meetingType.equals("audio")){
+                                builder.setVideoMuted(true);
+                            }
+                            JitsiMeetActivity.launch(OutgoingInvitationActivity.this, builder.build());
+                            finish();
+                        } catch (Exception e) {
+                            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            finish();
                         }
-                        JitsiMeetActivity.launch(OutgoingInvitationActivity.this, builder.build());
-                        finish();
-                    } catch (Exception e) {
-                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        finish();
+                    } else if (meetingType.equals("game")) {
+                        Intent intent1 = new Intent(getApplicationContext(), PlayerName.class);
+                        startActivity(intent1);
                     }
+
                 } else {
                     Toast.makeText(context, "Invitation Rejected", Toast.LENGTH_SHORT).show();
                     finish();

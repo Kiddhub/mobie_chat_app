@@ -65,5 +65,7 @@ dependencies {
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
 
+    implementation("com.google.firebase:firebase-database")
+
     implementation ('org.jitsi.react:jitsi-meet-sdk:8.1.2') { transitive = true }
 }

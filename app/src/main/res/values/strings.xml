@@ -15,4 +15,19 @@
     <string name="online">Online</string>
     <string name="incoming_meeting_invitation">Incoming Meeting Invitation</string>
     <string name="sending_meeting_invitation">Sending Meeting Invitation</string>
+    <string name="player_one">Player One</string>
+    <string name="player_two">Player Two</string>
+    <string name="it_is_draw">It is draw</string>
+    <string name="start_new_match">Start new match</string>
+    <string name="tic_tac_toe">Tic Tac Toe</string>
+    <string name="enter_your_name">Enter Your Name</string>
+    <string name="start_game">Start Game</string>
+    <string name="go">Go</string>
+
+    <!--<string name="tic_tac_toe">Tic Tac Toe</string>
+    <string name="enter_your_name">Enter Your Name</string>
+    <string name="start_game">Start Game</string>
+    <string name="player_one">Player One</string>
+    <string name="player_two">Player Two</string>
+    <string name="start_new_match">Start New Match</string>-->
 </resources>

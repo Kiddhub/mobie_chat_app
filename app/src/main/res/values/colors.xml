@@ -12,4 +12,13 @@
     <color name="green">#008000</color>
     <color name="colorMeetingInvitationStart">#4004BB</color>
     <color name ="colorMeetingInvitationEnd">#8A1AAA</color>
+
+    <color name="colorPrimary">#9C27B0</color>
+    <color name="colorPrimaryVariant">#7B1FA2</color>
+    <color name="colorOnPrimary">#FFFFFFFF</color>
+    <color name="colorSecondary">#80CBC4</color>
+    <color name="colorSecondaryVariant">#00796B</color>
+    <color name="colorOnSecondary">#212121</color>
+    <color name="purple">#6648C3</color>
+    <color name="dark_blue">#101132</color>
 </resources>

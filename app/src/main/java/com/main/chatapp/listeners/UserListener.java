@@ -8,6 +8,8 @@ public interface UserListener {
     void initiateVideoMeeting(User user);
 //
     void initiateAudioMeeting(User user);
+
+    void initiateGame(User user);
 //
 //    void onConversionClicked(User user);
 }
