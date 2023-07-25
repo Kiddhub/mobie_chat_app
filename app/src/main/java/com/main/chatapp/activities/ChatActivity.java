@@ -45,7 +45,6 @@ import retrofit2.Response;
 public class ChatActivity extends BaseActivity implements UserListener {
     private ActivityChatBinding binding;
     private User receiverUser;
-
     private List<ChatMessage> chatMessages;
     private ChatAdapter chatAdapter;
     private PreferenceManager preferenceManager;

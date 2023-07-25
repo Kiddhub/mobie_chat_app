@@ -24,13 +24,9 @@ public class TicTacToeActivity extends AppCompatActivity {
     private LinearLayout player1Layout,player2Layout;
     private ImageView image1,image2,image3,image4,image5,image6,image7,image8,image9;
     private TextView player1TV,player2TV;
-
-
     private final List<int[]> combinationsList = new ArrayList<>();
     private final List<String> doneBoxes = new ArrayList<>();
-
     private String playerUniqueId = "0";
-
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://mydb-72c43-default-rtdb.firebaseio.com/");
 
     private boolean opponentFound = false;

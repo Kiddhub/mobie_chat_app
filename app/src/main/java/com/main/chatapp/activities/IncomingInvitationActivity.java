@@ -4,11 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.Image;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -49,8 +46,10 @@ public class IncomingInvitationActivity extends AppCompatActivity {
         if (meetingType != null){
             if(meetingType.equals("video")){
                 binding.imageMeetingType.setImageResource(R.drawable.ic_video);
-            }else {
+            }else if(meetingType.equals("audio")) {
                 binding.imageMeetingType.setImageResource(R.drawable.ic_audio);
+            }else{
+                binding.imageMeetingType.setImageResource(R.drawable.ic_game);
             }
         }
         String name = getIntent().getStringExtra(Constants.KEY_NAME);

@@ -27,7 +27,6 @@ import java.util.HashMap;
 
 public class SignUpActivity extends AppCompatActivity {
     private ActivitySignUpBinding binding;
-
     private PreferenceManager preferenceManager;
     private String encodedImage;
 
